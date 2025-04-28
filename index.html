@@ -1,15 +1,66 @@
 <script src="https://cdn.jsdelivr.net/gh/netizenorg/netnet-standard-library/build/nn.min.js"></script>
 <script>
 /* global nn */
-  async function setup () {
-    const url = 'https://dog.ceo/api/breeds/image/random'
-    const res = await fetch(url)
-    const json = await res.json()
-    console.log(json.message)
+  let deck_id
+  let url = 'https://deckofcardsapi.com/api/deck/'
+  let img_url
+  
+  async function returnCard () {
+    const return_url = url + deck_id + '/return/'
+    await fetch(return_url)
+  }
+  
+  async function draw () {
+    const draw_url = url + deck_id + '/draw/?count=1'
+    const draw_res = await fetch(draw_url)
+    const draw_json = await draw_res.json()
     
-    nn.create('img')
-      .set('src', json.message)
+    img_url = draw_json.cards[0].image
+    console.log(img_url)
+    const card_img = await nn.loadImage(img_url)
+    const card = nn.create('img')
+      .set({
+        src: img_url
+      })
+      .css({
+        position: 'absolute',
+        top: nn.height / 2 - card_img.height / 2,
+        left: nn.width / 2 - card_img.width / 2,
+        cursor: 'pointer'
+      })
       .addTo('body')
+      .on('click', () => {
+        returnCard()
+        card.css({
+          display: 'none'
+        })
+        draw()
+      })
+  }
+  
+  async function setup () {
+    const new_deck_url = url + 'new/shuffle/?deck_count=1'
+    const res = await fetch(new_deck_url)
+    const json = await res.json()
+    deck_id = json.deck_id
+    
+    const start = nn.create('div')
+      .content('Press this to draw a card!')
+      .css({
+        position: 'absolute',
+        top: nn.height / 2 - 30,
+        width: nn.width,
+        textAlign: 'center',
+        fontSize: 30,
+        cursor: 'pointer'
+      })
+      .addTo('body')
+      .on('click', () => {
+        start.css({
+          display: 'none'
+        })
+        draw()
+      })
   }
 
   nn.on('load', setup)
