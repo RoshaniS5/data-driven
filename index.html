@@ -4,7 +4,8 @@
   let deck_id
   let url = 'https://deckofcardsapi.com/api/deck/'
   let img_url
-  const back_of_card = 'card back red.png'
+  const back_of_card = 'card_back_red.png'
+  const sample_card = '6H.png'
   
   async function returnCard () {
     const return_url = url + deck_id + '/return/'
@@ -39,7 +40,8 @@
   }
   
   async function setup () {
-    const back_of_card_img = await nn.loadImage(back_of_card)
+    await nn.loadImage(back_of_card)
+    const sample_card_img = await nn.loadImage(sample_card)
     
     const new_deck_url = url + 'new/shuffle/?deck_count=1'
     const res = await fetch(new_deck_url)
@@ -50,28 +52,49 @@
       .content('Click to draw a card!')
       .css({
         position: 'absolute',
-        top: nn.height / 4 - 30,
+        top: nn.height / 5 - 30,
         width: nn.width,
         textAlign: 'center',
         fontSize: 30,
       })
       .addTo('body')
     
-      const start = nn.create('img')
+    const start = nn.create('img')
         .set({
           src: back_of_card
         })
         .css({
           position: 'absolute',
-          top: nn.height / 2 - back_of_card_img.height / 2,
-          left: nn.width / 2 - back_of_card_img.width / 2
+          height: sample_card_img.height,
+          cursor: 'pointer',
+          transition: 'all 1s'
         })
+        .addTo('body')
         .on('click', () => {
           start.css({
             display: 'none'
           })
           draw()
         })
+    
+    start.css({
+      top: nn.height / 2 - start.height / 2,
+      left: nn.width / 2 - start.width / 2
+    })
+    
+    start.on('mouseover', () => {
+      start.css({
+        filter: 'drop-shadow(0px 0px 10px chartreuse)',
+        transform: 'scale(1.1)'
+      })
+    })
+    
+    start.on('mouseout', () => {
+      start.css({
+        filter: 'none',
+        transform: 'scale(1)'
+      })
+    })
   }
 
   nn.on('load', setup)
