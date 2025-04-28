@@ -16,6 +16,7 @@
     const draw_url = url + deck_id + '/draw/?count=1'
     const draw_res = await fetch(draw_url)
     const draw_json = await draw_res.json()
+    let color
     
     img_url = draw_json.cards[0].image
     const card_img = await nn.loadImage(img_url)
@@ -27,6 +28,7 @@
         position: 'absolute',
         top: nn.height / 2 - card_img.height / 2,
         left: nn.width / 2 - card_img.width / 2,
+        transition: 'all 1s',
         cursor: 'pointer'
       })
       .addTo('body')
@@ -37,6 +39,20 @@
         })
         draw()
       })
+    
+    card.on('mouseout', () => {
+      card.css({
+        filter: 'drop-shadow(0px 0px 10px ${color})',
+        transform: 'scale(1.1)'
+      })
+    })
+    
+    card.on('mouseout', () => {
+      card.css({
+        filter: 'none',
+        transform: 'scale(1)'
+      })
+    })
   }
   
   async function setup () {
