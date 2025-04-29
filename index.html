@@ -6,17 +6,35 @@
   let img_url
   const back_of_card = 'card_back_red.png'
   const sample_card = '6H.png'
+  const colors = {
+    1: 'MediumVioletRed',
+    2: 'Salmon',
+    3: 'Coral',
+    4: 'Gold',
+    5: 'PeachPuff',
+    6: 'RosyBrown',
+    7: 'DarkGoldenrod',
+    8: 'Bisque',
+    9: 'Olive',
+    10: 'DarkOrchid',
+    JACK: 'SlateBlue',
+    QUEEN: 'Navy',
+    KING: 'Aquamarine',
+    ACE: 'Pink'
+  }
   
   async function returnCard () {
     const return_url = url + deck_id + '/return/'
     await fetch(return_url)
+    const shuffle_url = url + deck_id + '/shuffle/'
+    await fetch(shuffle_url)
   }
   
   async function draw () {
     const draw_url = url + deck_id + '/draw/?count=1'
     const draw_res = await fetch(draw_url)
     const draw_json = await draw_res.json()
-    let color
+    let color = colors[draw_json.cards[0].value]
     
     img_url = draw_json.cards[0].image
     const card_img = await nn.loadImage(img_url)
@@ -40,9 +58,9 @@
         draw()
       })
     
-    card.on('mouseout', () => {
+    card.on('mouseover', () => {
       card.css({
-        filter: 'drop-shadow(0px 0px 10px ${color})',
+        filter: `drop-shadow(0px 0px 10px ${color})`,
         transform: 'scale(1.1)'
       })
     })
